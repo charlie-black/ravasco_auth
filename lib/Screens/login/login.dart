@@ -3,6 +3,8 @@ import 'package:login_ui/Screens/register/register.dart';
 import 'package:login_ui/components/background.dart';
 import 'package:http/http.dart' as http;
 
+import '../HomePage.dart';
+
 class LoginScreen extends StatefulWidget {
   @override
   _LoginScreenState createState() => _LoginScreenState();
@@ -103,7 +105,7 @@ class _LoginScreenState extends State<LoginScreen> {
               margin: EdgeInsets.symmetric(horizontal: 40, vertical: 10),
               child: RaisedButton(
                 onPressed: () {
-                  loginUser();
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage()));
                 },
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(80.0)),
                 textColor: Colors.white,
