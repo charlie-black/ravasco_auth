@@ -17,7 +17,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     var headers = {
       'Accept': 'application/json'
     };
-    var request = http.MultipartRequest('POST', Uri.parse('https://test-auth-drf.herokuapp.com/api/auth/register/'));
+    var request = http.MultipartRequest('POST', Uri.parse('https://upskiell-api.herokuapp.com/register/'));
     request.fields.addAll({
       'email': _email.text.toString(),
       'password2': _confirmPassword.text.toString(),

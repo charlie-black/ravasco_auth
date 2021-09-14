@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:login_ui/Screens/register/register.dart';
 import 'package:login_ui/components/background.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../HomePage.dart';
 
@@ -13,29 +16,36 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _email = TextEditingController();
   final _password = TextEditingController();
-  Future<void> loginUser()async{
-    var headers = {
-      'Authorization': 'Bearer 9944b09199c62bcf9418ad846dd0e4bbdfc6ee4b',
-      'Accept': 'application/json'
+  bool _isLoading = false;
+
+  signIn(String email, pass) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    Map data = {
+      'email': email,
+      'password': pass
     };
-    var request = http.MultipartRequest('POST', Uri.parse('https://test-auth-drf.herokuapp.com/api/auth/login/'));
-    request.fields.addAll({
-      'email': _email.text.toString(),
-      'password': _password.text.toString()
-    });
+    var jsonResponse;
+    var response = await http.post(Uri.parse("https://upskiell-api.herokuapp.com/login/"), body: data);
+    if(response.statusCode == 200) {
+      print(response.body);
 
-    request.headers.addAll(headers);
-
-    http.StreamedResponse response = await request.send();
-
-    if (response.statusCode == 200) {
-      print(await response.stream.bytesToString());
+      jsonResponse = json.decode(response.body);
+      if(jsonResponse != null) {
+        setState(() {
+          _isLoading = false;
+        });
+       // sharedPreferences.setString("token", jsonResponse['token']);
+        Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage()));
+      }
     }
     else {
-      print(response.reasonPhrase);
+      setState(() {
+        _isLoading = false;
+      });
+      print(response.body);
     }
-
   }
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -105,7 +115,11 @@ class _LoginScreenState extends State<LoginScreen> {
               margin: EdgeInsets.symmetric(horizontal: 40, vertical: 10),
               child: RaisedButton(
                 onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage()));
+                  setState(() {
+                    _isLoading = true;
+                  });
+                  signIn(_email.text, _password.text);
+                 // Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage()));
                 },
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(80.0)),
                 textColor: Colors.white,
